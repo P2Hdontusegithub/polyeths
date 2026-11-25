@@ -1,0 +1,11 @@
+{
+  "name": "the-polyeths",
+  "version": "1.0.0",
+  "description": "The Polyeths — PET & HDPE: game đi cảnh giải đố hợp tác 2 người chơi trên trình duyệt",
+  "private": true,
+  "scripts": {
+    "start": "node tools/serve.js 8080",
+    "test": "node --test \"tests/*.test.js\""
+  },
+  "license": "UNLICENSED"
+}

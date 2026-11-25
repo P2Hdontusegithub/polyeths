@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Polyeths — PET &amp; HDPE</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="game" width="960" height="544"></canvas>
+
+      <!-- HUD -->
+      <div id="hud" class="hidden">
+        <div class="hud-top">
+          <div class="hud-box" id="hud-zone">Khu A</div>
+          <div class="hud-box" id="hud-time">00:00</div>
+          <div class="hud-box hud-players">
+            <span class="tag pet">P1 PET</span> <span id="hud-d1">0</span> lần hỏng
+            &nbsp;·&nbsp;
+            <span class="tag hdpe">P2 HDPE</span> <span id="hud-d2">0</span> lần hỏng
+          </div>
+        </div>
+        <ul id="hud-objectives" class="hud-box"></ul>
+        <div id="hud-messages"></div>
+        <div id="hud-sign" class="hidden"></div>
+        <div class="hud-hint">H: hướng dẫn · P/Esc: tạm dừng · R: chơi lại · M: âm thanh</div>
+      </div>
+
+      <!-- Màn hình bắt đầu / hướng dẫn -->
+      <div id="menu" class="overlay">
+        <div class="panel">
+          <h1>THE POLYETHS</h1>
+          <p class="subtitle">PET &amp; HDPE — game đi cảnh giải đố hợp tác 2 người</p>
+          <div id="help-content">
+            <div class="cols">
+              <div class="card pet">
+                <h3>P1 — PET ♳1</h3>
+                <p class="keys"><kbd>A</kbd> <kbd>D</kbd> di chuyển · <kbd>W</kbd>/<kbd>Space</kbd> nhảy · <kbd>S</kbd> thả xuống</p>
+                <ul>
+                  <li><b>Trong suốt</b>: đi xuyên tia sáng mà không làm gián đoạn tín hiệu.</li>
+                  <li>Nhảy cao và xa hơn.</li>
+                  <li>Phải <b>nhảy qua</b> bể NaOH. Không chịu được máy dập.</li>
+                </ul>
+              </div>
+              <div class="card hdpe">
+                <h3>P2 — HDPE ♴2</h3>
+                <p class="keys"><kbd>←</kbd> <kbd>→</kbd> di chuyển · <kbd>↑</kbd> nhảy · <kbd>↓</kbd> thả xuống</p>
+                <ul>
+                  <li><b>Dai, chịu va đập</b>: chặn được máy dập &amp; máy ép.</li>
+                  <li>Có thể <b>chạy qua</b> bể NaOH — không được dừng, có giới hạn thời gian.</li>
+                  <li>Đục: bị tia sáng chặn lại.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="card">
+              <h3>Mục tiêu</h3>
+              <ol>
+                <li><b>Khu B</b> — vượt hành lang hoá chất: bể <span class="naoh">NaOH</span> và bể <span class="oxid">chất thải oxy hoá giả lập</span> (nguy hiểm cho cả hai).</li>
+                <li><b>Khu C</b> — leo sàn lưới lên hai phòng: PET lấy <b>Vật phẩm A</b> ở Phòng A (ánh sáng), HDPE lấy <b>Vật phẩm B</b> ở Phòng B (máy dập).</li>
+                <li><b>Khu D</b> — PET đứng trên <b>tấm cảm biến</b> để bật <b>cầu ánh sáng</b>; máy ép bắt đầu hạ xuống → HDPE qua cầu và <b>đứng dưới máy ép để chặn</b>. Giữ cả hai điều kiện đến khi thanh đồng bộ đầy.</li>
+                <li><b>Khu E</b> — cả hai cùng vào cửa thoát.</li>
+              </ol>
+              <p class="small">Hỏng thì hồi sinh ở đèn checkpoint gần nhất (đèn xanh). Hai nhân vật không thể tách nhau quá xa. Đứng cạnh biển <b>!</b> để đọc gợi ý.</p>
+            </div>
+            <details class="card">
+              <summary>Lưu ý khoa học</summary>
+              <ul class="small">
+                <li>PET thường trong suốt hơn HDPE, nhưng mức truyền sáng phụ thuộc cấu tạo, độ dày và loại vật liệu.</li>
+                <li>HDPE thường dai và chịu va đập tốt, nhưng không chịu được mọi lực hay mọi điều kiện.</li>
+                <li>Tính kháng hoá chất phụ thuộc nồng độ, nhiệt độ, thời gian tiếp xúc và phụ gia — không chỉ tên polymer.</li>
+                <li>Các luật như “PET phải nhảy qua NaOH”, “HDPE phải chạy nhanh” là cơ chế game đơn giản hoá, <b>không phải hướng dẫn thí nghiệm</b>. Bể oxy hoá là yếu tố giả lập.</li>
+                <li>Không thử nghiệm với NaOH hay chất oxy hoá thật để kiểm chứng game.</li>
+              </ul>
+            </details>
+          </div>
+          <div class="actions">
+            <button id="btn-start" class="primary">Bắt đầu (Enter)</button>
+            <button id="btn-resume" class="primary hidden">Tiếp tục (P)</button>
+            <button id="btn-restart" class="hidden">Chơi lại (R)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chiến thắng -->
+      <div id="win" class="overlay hidden">
+        <div class="panel">
+          <h1>HOÀN THÀNH!</h1>
+          <p class="subtitle">PET và HDPE đã cùng nhau thoát khỏi nhà máy.</p>
+          <div id="win-stats" class="card"></div>
+          <p class="small">PET mở đường bằng năng lực ánh sáng, HDPE giữ lối đi bằng khả năng chịu va đập — không ai tự làm được một mình.</p>
+          <div class="actions"><button id="btn-again" class="primary">Chơi lại (Enter)</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thứ tự nạp: config -> level -> engine -> render -> audio -> main -->
+  <script src="js/config.js"></script>
+  <script src="js/level.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
